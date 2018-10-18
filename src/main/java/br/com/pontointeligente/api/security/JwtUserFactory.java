@@ -1,7 +1,7 @@
 package br.com.pontointeligente.api.security;
 
+import br.com.pontointeligente.api.entities.Funcionario;
 import br.com.pontointeligente.api.enums.PerfilEnum;
-import br.com.pontointeligente.api.security.entities.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -14,14 +14,14 @@ public class JwtUserFactory {
     /**
      * Converte e gera um JwtUser com base nos dados de um funcionário.
      *
-     * @param usuario
+     * @param funcionario
      * @return JwtUser
      */
 
-    public static JwtUser create ( Usuario usuario ) {
-        return new JwtUser ( usuario . getId (), usuario . getEmail (),
-                usuario . getSenha (),
-                mapToGrantedAuthorities ( usuario . getPerfil ()));
+    public static JwtUser create ( Funcionario funcionario) {
+        return new JwtUser ( funcionario.getId(), funcionario.getEmail(),
+                funcionario.getSenha(),
+                mapToGrantedAuthorities (funcionario.getPerfil()));
     }
     /**
      * Converte o perfil do usuário para o formato utilizado pelo Spring Security.

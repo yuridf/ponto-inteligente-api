@@ -107,14 +107,13 @@ public class JwtTokenUtil {
      */
     private Claims getClaimsFromToken ( String token ) {
 
-        Claims claims ;
+        Claims claims;
         try {
-            claims = Jwts. parser (). setSigningKey ( secret )
-                    . parseClaimsJws ( token ). getBody ();
+            claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
         } catch ( Exception e ) {
-            claims = null ;
+            claims = null;
         }
-        return claims ;
+        return claims;
     }
     /**
      * Retorna a data de expiração com base na data atual.
@@ -146,7 +145,7 @@ public class JwtTokenUtil {
      * @return String
      */
     private String gerarToken ( Map < String , Object > claims ) {
-        return Jwts . builder (). setClaims ( claims ). setExpiration ( gerarDataExpiracao ())
-                . signWith ( SignatureAlgorithm. HS512 , secret ). compact ();
+        return Jwts.builder().setClaims(claims).setExpiration(gerarDataExpiracao()).signWith(
+                SignatureAlgorithm.HS512,secret).compact();
     }
 }

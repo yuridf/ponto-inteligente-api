@@ -7,6 +7,7 @@ import br.com.pontointeligente.api.security.utils.JwtTokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,17 +27,17 @@ import java.util.Optional;
 @RequestMapping( "/auth" )
 @CrossOrigin( origins = "*" )
 public class AuthenticationController {
-    private static final Logger log =
-            LoggerFactory. getLogger ( AuthenticationController . class );
+    private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
     private static final String TOKEN_HEADER = "Authorization" ;
     private static final String BEARER_PREFIX = "Bearer " ;
 
     @Autowired
-    private AuthenticationManager authenticationManager ;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil ;
 
+    @Qualifier("jwtUserDetailsServiceImpl")
     @Autowired
     private UserDetailsService userDetailsService ;
     /**
@@ -48,24 +49,21 @@ public class AuthenticationController {
      * @throws AuthenticationException
      */
     @PostMapping
-    public ResponseEntity<Response<TokenDto>> gerarTokenJwt (
-            @Valid @RequestBody JwtAuthenticationDto authenticationDto ,
-            BindingResult result )
-            throws AuthenticationException {
-        Response < TokenDto > response = new Response < TokenDto >();
-        if ( result . hasErrors ()) {
+    public ResponseEntity<Response<TokenDto>> gerarTokenJwt (@Valid @RequestBody JwtAuthenticationDto authenticationDto,
+            BindingResult result ) throws AuthenticationException {
+        Response <TokenDto> response = new Response < TokenDto >();
+
+        if ( result.hasErrors ()) {
             log . error ( "Erro validando lançamento: {}" , result . getAllErrors ());
-            result . getAllErrors (). forEach ( error -> response . getErrors ()
-                    . add ( error . getDefaultMessage ()));
-            return ResponseEntity . badRequest (). body ( response );
+            result.getAllErrors().forEach ( error -> response.getErrors().add (error.getDefaultMessage ()));
+            return ResponseEntity.badRequest().body(response);
         }
-        log . info ( "Gerando token para o email {}." , authenticationDto . getEmail ());
-        Authentication authentication = authenticationManager . authenticate (
-                new UsernamePasswordAuthenticationToken(
-                        authenticationDto . getEmail (), authenticationDto . getSenha ()));
-        SecurityContextHolder. getContext (). setAuthentication ( authentication );
-        UserDetails userDetails = userDetailsService . loadUserByUsername (
-                authenticationDto . getEmail ());
+
+        log . info ( "Gerando token para o email {}." , authenticationDto.getEmail ());
+        Authentication authentication = authenticationManager.authenticate (
+                new UsernamePasswordAuthenticationToken(authenticationDto.getEmail (), authenticationDto.getSenha()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        UserDetails userDetails = userDetailsService.loadUserByUsername (authenticationDto.getEmail ());
         String token = jwtTokenUtil . obterToken ( userDetails );
         response . setData ( new TokenDto ( token ));
 
@@ -78,26 +76,24 @@ public class AuthenticationController {
      * @return ResponseEntity<Response<TokenDto>>
      */
     @PostMapping ( value = "/refresh" )
-    public ResponseEntity < Response < TokenDto >> gerarRefreshTokenJwt (
-            HttpServletRequest request ) {
+    public ResponseEntity < Response < TokenDto >> gerarRefreshTokenJwt (HttpServletRequest request ) {
         log . info ( "Gerando refresh token JWT." );
-        Response < TokenDto > response = new Response < TokenDto >();
-        Optional< String > token = Optional . ofNullable (
-                request . getHeader ( TOKEN_HEADER ));
-        if ( token . isPresent () && token . get (). startsWith ( BEARER_PREFIX )) {
-            token = Optional . of ( token . get (). substring (7));
+        Response <TokenDto> response = new Response < TokenDto >();
+        Optional<String> token = Optional.ofNullable(request.getHeader(TOKEN_HEADER));
+        if (token.isPresent () && token.get().startsWith(BEARER_PREFIX)) {
+            token = Optional.of(token.get().substring (7));
         }
-        if (! token . isPresent ()) {
-            response . getErrors (). add ( "Token não informado." );
-        } else if (! jwtTokenUtil . tokenValido ( token . get ())) {
-            response . getErrors (). add ( "Token inválido ou expirado." );
+        if (!token.isPresent ()) {
+            response.getErrors().add("Token não informado.");
+        } else if (!jwtTokenUtil.tokenValido(token.get())) {
+            response.getErrors().add("Token inválido ou expirado.");
         }
-        if (! response . getErrors (). isEmpty ()) {
-            return ResponseEntity . badRequest (). body ( response );
+        if (!response.getErrors().isEmpty ()) {
+            return ResponseEntity.badRequest().body(response);
         }
-        String refreshedToken = jwtTokenUtil . refreshToken ( token . get ());
-        response . setData ( new TokenDto ( refreshedToken ));
+        String refreshedToken = jwtTokenUtil.refreshToken (token.get());
+        response.setData(new TokenDto(refreshedToken));
 
-        return ResponseEntity . ok ( response );
+        return ResponseEntity.ok(response);
     }
 }
