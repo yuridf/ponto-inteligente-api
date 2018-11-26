@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,6 +31,19 @@ public class FuncionarioController {
 	private FuncionarioService funcionarioService;
 
 	public FuncionarioController() {
+	}
+
+	@GetMapping
+	public ResponseEntity<List<FuncionarioDto>> listar() {
+		List<FuncionarioDto> lista = new ArrayList<>();
+		FuncionarioDto f = new FuncionarioDto();
+		f.setNome("Yuri");
+		f.setUrl("www.google.com");
+		f.setLotacao("CrossFit");
+
+		lista.add(f);
+
+		return ResponseEntity.ok(lista);
 	}
 
 	/**

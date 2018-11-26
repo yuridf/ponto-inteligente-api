@@ -16,6 +16,9 @@ public class FuncionarioDto {
 	private Optional<String> qtdHorasTrabalhoDia = Optional.empty();
 	private Optional<String> qtdHorasAlmoco = Optional.empty();
 
+	private String url;
+	private String lotacao;
+
 	public FuncionarioDto() {
 	}
 
@@ -87,4 +90,19 @@ public class FuncionarioDto {
 				+ "]";
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getLotacao() {
+		return lotacao;
+	}
+
+	public void setLotacao(String lotacao) {
+		this.lotacao = lotacao;
+	}
 }
